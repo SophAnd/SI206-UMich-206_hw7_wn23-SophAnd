@@ -62,7 +62,8 @@ def make_players_table(data, cur, conn):
         id = int(player['id'])
         name = player['name']
         position = player['position']
-        position_id = cur.execute("SELECT id FROM Positions WHERE position = (?)", (position,))
+        cur.execute("SELECT id FROM Positions WHERE position = (?)", (position,))
+        position_id = cur.fetchone()[0]
         birthdate = player['dateOfBirth']
         birthyear = int(birthdate[:4])
         nationality = player['nationality']
@@ -70,8 +71,9 @@ def make_players_table(data, cur, conn):
         names.append(name)
         position_ids.append(position_id)
         birthyears.append(birthyear)
-        if nationality not in nationalities:
-            nationalities.append(nationality)
+        nationalities.append(nationality)
+        '''if nationality not in nationalities:
+            nationalities.append(nationality)'''
     cur.execute("CREATE TABLE IF NOT EXISTS Players (id INTEGER PRIMARY KEY, name TEXT, position_id INTEGER, birthyear INTEGER, nationality TEXT)")
     for i in range(len(ids)):
         cur.execute("INSERT OR IGNORE INTO Players (id, name, position_id, birthyear,nationality) VALUES (?,?,?,?,?)",(ids[i], names[i], position_ids[i], birthyears[i], nationalities[i]))
