@@ -145,8 +145,16 @@ def birthyear_nationality_search(age, country, cur, conn):
     # HINT: You'll have to use JOIN for this task.
 
 def position_birth_search(position, age, cur, conn):
-       pass
-
+    tuple_list = []
+    target_year = 2023 - age 
+    cur.execute("SELECT Players.name, Players.birthyear FROM Players JOIN Positions ON Positions.id = Players.position_id WHERE Positions.position = (?) AND birthyear > (?)", (position, target_year))
+    rows = cur.fetchall()
+    for row in rows:
+        name = row[0]
+        birthyear= row[1]
+        tuple_list.append((name, position, birthyear))
+    conn.commit()
+    return tuple_list
 
 # [EXTRA CREDIT]
 # You’ll make 3 new functions, make_winners_table(), make_seasons_table(),
@@ -232,7 +240,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertEqual(a[3][2], 1992)
         self.assertEqual(len(a[1]), 3)
 
-    '''def test_type_speed_defense_search(self):
+    def test_type_speed_defense_search(self):
         b = sorted(position_birth_search('Goalkeeper', 35, self.cur, self.conn))
         self.assertEqual(len(b), 2)
         self.assertEqual(type(b[0][0]), str)
@@ -244,7 +252,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertEqual(len(c), 1)
         self.assertEqual(c, [('Teden Mengi', 'Defence', 2002)])
     
-    # test extra credit
+    '''# test extra credit
     def test_make_winners_table(self):
         self.cur2.execute('SELECT * from Winners')
         winners_list = self.cur2.fetchall()
