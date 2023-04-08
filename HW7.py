@@ -72,11 +72,9 @@ def make_players_table(data, cur, conn):
         position_ids.append(position_id)
         birthyears.append(birthyear)
         nationalities.append(nationality)
-        '''if nationality not in nationalities:
-            nationalities.append(nationality)'''
     cur.execute("CREATE TABLE IF NOT EXISTS Players (id INTEGER PRIMARY KEY, name TEXT, position_id INTEGER, birthyear INTEGER, nationality TEXT)")
     for i in range(len(ids)):
-        cur.execute("INSERT OR IGNORE INTO Players (id, name, position_id, birthyear,nationality) VALUES (?,?,?,?,?)",(ids[i], names[i], position_ids[i], birthyears[i], nationalities[i]))
+        cur.execute("INSERT OR IGNORE INTO Players (id, name, position_id, birthyear, nationality) VALUES (?,?,?,?,?)",(ids[i], names[i], position_ids[i], birthyears[i], nationalities[i]))
     conn.commit()
 
 ## [TASK 2]: 10 points
@@ -90,6 +88,16 @@ def make_players_table(data, cur, conn):
         # the player's name, their position_id, and their nationality.
 
 def nationality_search(countries, cur, conn):
+    tuple_list = []
+    for country in countries:
+        cur.execute("SELECT name, position_id FROM Players WHERE nationality = (?)", (country,))
+        rows = cur.fetchall()
+        for row in rows:
+            name = row[0]
+            position_id = row[1]
+            tuple_list.append((name, position_id, country))
+    return tuple_list
+
     pass
 
 ## [TASK 3]: 10 points
@@ -197,7 +205,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertIs(type(players_list[0][3]), int)
         self.assertIs(type(players_list[0][4]), str)
 
-    '''def test_nationality_search(self):
+    def test_nationality_search(self):
         x = sorted(nationality_search(['England'], self.cur, self.conn))
         self.assertEqual(len(x), 11)
         self.assertEqual(len(x[0]), 3)
@@ -208,7 +216,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertEqual(y[2],('Fred', 2, 'Brazil'))
         self.assertEqual(y[0][1], 3)
 
-    def test_birthyear_nationality_search(self):
+    '''def test_birthyear_nationality_search(self):
 
         a = birthyear_nationality_search(24, 'England', self.cur, self.conn)
         self.assertEqual(len(a), 7)
