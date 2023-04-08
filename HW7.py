@@ -96,9 +96,8 @@ def nationality_search(countries, cur, conn):
             name = row[0]
             position_id = row[1]
             tuple_list.append((name, position_id, country))
+    conn.commit()
     return tuple_list
-
-    pass
 
 ## [TASK 3]: 10 points
 # finish the function birthyear_nationality_search
@@ -117,7 +116,16 @@ def nationality_search(countries, cur, conn):
 
 
 def birthyear_nationality_search(age, country, cur, conn):
-    pass
+    tuple_list = []
+    target_year = 2023 - age
+    cur.execute("SELECT name, birthyear FROM Players WHERE nationality = (?) AND birthyear < (?)", (country, target_year))
+    rows = cur.fetchall()
+    for row in rows:
+        name = row[0]
+        birthyear= row[1]
+        tuple_list.append((name, country, birthyear))
+    conn.commit()
+    return tuple_list
 
 ## [TASK 4]: 15 points
 # finish the function position_birth_search
@@ -216,7 +224,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertEqual(y[2],('Fred', 2, 'Brazil'))
         self.assertEqual(y[0][1], 3)
 
-    '''def test_birthyear_nationality_search(self):
+    def test_birthyear_nationality_search(self):
 
         a = birthyear_nationality_search(24, 'England', self.cur, self.conn)
         self.assertEqual(len(a), 7)
@@ -224,7 +232,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertEqual(a[3][2], 1992)
         self.assertEqual(len(a[1]), 3)
 
-    def test_type_speed_defense_search(self):
+    '''def test_type_speed_defense_search(self):
         b = sorted(position_birth_search('Goalkeeper', 35, self.cur, self.conn))
         self.assertEqual(len(b), 2)
         self.assertEqual(type(b[0][0]), str)
